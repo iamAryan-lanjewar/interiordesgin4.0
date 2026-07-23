@@ -80,3 +80,45 @@ h1, h2, h3, h4, h5, h6, .font-serif-header {
   background-repeat: repeat-x;
 }
 
+/* Premium zoom out animation for hero */
+@keyframes slowZoomOut {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-slow-zoom-out {
+  animation: slowZoomOut 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scroll Reveal animation system */
+.reveal-element {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.reveal-image-up {
+  transform: translateY(40px) scale(1.04);
+  transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-image-up.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.reveal-text-up {
+  transform: translateY(30px);
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-text-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+

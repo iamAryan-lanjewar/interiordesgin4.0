@@ -30,7 +30,7 @@ const PROJECTS = [
     subtitle: "Modern Minimalist Residence",
     location: "Nagpur",
     year: "2023",
-    image: "/images/project-terracotta.png"
+    image: "/images/project-living-room.jpg"
   },
   {
     id: "proj-2",
@@ -39,7 +39,7 @@ const PROJECTS = [
     subtitle: "Commercial Workspace",
     location: "Nagpur",
     year: "2024",
-    image: "/images/project-plaster.png"
+    image: "/images/project-desk.jpg"
   },
   {
     id: "proj-3",
@@ -129,6 +129,29 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // Scroll reveal observer
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -60px 0px"
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("revealed");
+        }
+      });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll(".reveal-element");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
   // Filter project grid list
   const filteredProjects = activeFilter === "all" 
     ? PROJECTS 
@@ -171,6 +194,37 @@ export default function Home() {
 
       if (response.ok) {
         setFormStatus("success");
+
+        // Format parameters for WhatsApp redirection to enhance UX
+        const projectTypeLabels = {
+          residential: "Residential Design",
+          commercial: "Commercial Workspace",
+          styling: "Styling & Art Curation",
+          other: "Other Space Planning"
+        };
+        const budgetLabels = {
+          "budget-1": "₹5L – ₹15L (INR)",
+          "budget-2": "₹15L – ₹50L (INR)",
+          "budget-3": "₹50L – ₹1.5Cr (INR)",
+          "budget-4": "Over ₹1.5Cr (INR)"
+        };
+
+        const projectLabel = projectTypeLabels[formProjectType] || formProjectType;
+        const budgetLabel = budgetLabels[formBudgetRange] || formBudgetRange;
+
+        const waText = `Hello Disha A Kewalramani,
+
+I would like to start a project journey with you! Here are my inquiry details:
+
+• Name: ${formName}
+• Email: ${formEmail}
+• Project Type: ${projectLabel}
+• Budget: ${budgetLabel}
+• Message: ${formMessage}`;
+
+        const whatsappUrl = `https://wa.me/919823577149?text=${encodeURIComponent(waText)}`;
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+
         // Reset fields
         setFormName("");
         setFormEmail("");
@@ -397,19 +451,19 @@ export default function Home() {
               
               {/* Left Column: Portrait */}
               <div className="lg:col-span-5">
-                <div className="relative hover-zoom-container aspect-[3/4] max-w-md mx-auto shadow-sm border border-studio-charcoal/5">
+                <div className="relative overflow-hidden aspect-[3/4] max-w-md mx-auto shadow-sm border border-studio-charcoal/5">
                   <Image 
-                    src="/images/designer-portrait.png" 
-                    alt="Interior Designer Disha A Kewalramani" 
+                    src="/images/project-chair.jpg" 
+                    alt="Bespoke handcrafted chair by Disha A Kewalramani" 
                     fill
                     sizes="(max-width: 768px) 100vw, 400px"
-                    className="object-cover hover-zoom-img"
+                    className="object-cover"
                   />
                 </div>
               </div>
 
               {/* Right Column: Copy & Grid */}
-              <div className="lg:col-span-7 flex flex-col justify-center">
+              <div className="lg:col-span-7 flex flex-col justify-center reveal-element reveal-text-up">
                 <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
                   THE STUDIO
                 </span>
@@ -528,17 +582,19 @@ export default function Home() {
                     key={project.id} 
                     className={`${gridClasses} group flex flex-col bg-transparent`}
                   >
-                    <div className="relative hover-zoom-container aspect-[4/3] md:aspect-[1.3] w-full border border-studio-charcoal/5 shadow-sm">
+                    <div className={`relative w-full border border-studio-charcoal/5 shadow-sm overflow-hidden ${
+                      idx === 1 ? "aspect-[4/5]" : "aspect-square"
+                    }`}>
                       <Image 
                         src={project.image} 
                         alt={project.title} 
                         fill
                         sizes="(max-width: 768px) 100vw, 600px"
-                        className="object-cover hover-zoom-img"
+                        className="object-cover"
                       />
                       
                       {/* Project quick details overlay on hover */}
-                      <div className="absolute inset-0 bg-studio-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8 backdrop-blur-[2px]">
+                      <div className="absolute inset-0 bg-studio-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
                         <div className="text-studio-offwhite text-xs tracking-widest font-light flex items-center justify-between">
                           <span>{project.location}</span>
                           <span>{project.year}</span>
@@ -588,7 +644,7 @@ export default function Home() {
         >
           <div className="mx-auto max-w-7xl px-6 sm:px-8">
             
-            <div className="text-center max-w-xl mx-auto mb-16 md:mb-24">
+            <div className="text-center max-w-xl mx-auto mb-16 md:mb-24 reveal-element reveal-text-up">
               <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
                 OUR DESIGN PROCESS
               </span>
@@ -601,7 +657,7 @@ export default function Home() {
             </div>
 
             {/* Desktop timeline nodes */}
-            <div className="hidden lg:grid grid-cols-4 gap-8 relative">
+            <div className="hidden lg:grid grid-cols-4 gap-8 relative reveal-element reveal-text-up">
               {/* Dotted connecting line background */}
               <div className="absolute top-[28px] left-[12.5%] right-[12.5%] h-[1px] process-line" />
               
@@ -635,7 +691,7 @@ export default function Home() {
             </div>
 
             {/* Interactive Timeline Detail Box */}
-            <div className="mt-12 lg:mt-16 mx-auto max-w-4xl bg-studio-beige border border-studio-charcoal/10 p-8 md:p-12 shadow-sm rounded-sm">
+            <div className="mt-12 lg:mt-16 mx-auto max-w-4xl bg-studio-beige border border-studio-charcoal/10 p-8 md:p-12 shadow-sm rounded-sm reveal-element reveal-text-up">
               {/* Mobile steps controller */}
               <div className="flex lg:hidden justify-between items-center border-b border-studio-charcoal/10 pb-6 mb-6">
                 <button
@@ -950,12 +1006,12 @@ export default function Home() {
                       <div>
                         <span className="font-medium text-studio-charcoal block">Phone / WhatsApp</span>
                         <a 
-                          href="https://wa.me/919876543210" 
+                          href="https://wa.me/919823577149" 
                           target="_blank" 
                           rel="noopener noreferrer" 
                           className="mt-1 font-light text-studio-charcoal/70 hover:text-studio-terracotta transition-colors block"
                         >
-                          +91 98765 43210 (Quick Connect)
+                          +91 98235 77149 (Quick Connect)
                         </a>
                       </div>
                     </div>
