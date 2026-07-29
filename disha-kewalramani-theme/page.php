@@ -13,9 +13,10 @@ get_header();
 	if ( have_posts() ) :
 		while ( have_posts() ) :
 			the_post();
+			$is_elementor = function_exists( 'disha_kewalramani_is_elementor_page' ) && disha_kewalramani_is_elementor_page( get_the_ID() );
 			?>
 			<article id="post-<?php the_ID(); ?>" <?php post_class( 'entry-content' ); ?>>
-				<?php if ( ! is_front_page() && ! Elementor\Plugin::$instance->db->is_built_with_elementor( get_the_ID() ) ) : ?>
+				<?php if ( ! is_front_page() && ! $is_elementor ) : ?>
 					<h1 class="font-serif text-3xl md:text-5xl font-light text-studio-charcoal mb-8">
 						<?php the_title(); ?>
 					</h1>
@@ -26,7 +27,7 @@ get_header();
 					the_content();
 
 					wp_link_pages( array(
-						'before' => '<div class="page-links">' . __( 'Pages:', 'disha-kewalramani-theme' ),
+						'before' => '<div class="page-links mt-6">' . __( 'Pages:', 'disha-kewalramani-theme' ),
 						'after'  => '</div>',
 					) );
 					?>
@@ -34,8 +35,6 @@ get_header();
 			</article>
 			<?php
 		endwhile;
-	else :
-		get_template_part( 'template-parts/content', 'none' );
 	endif;
 	?>
 </div>

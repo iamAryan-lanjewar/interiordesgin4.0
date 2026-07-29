@@ -4,7 +4,7 @@ Theme URI: https://dishakewalramani.com
 Author: Disha A Kewalramani Studio
 Author URI: https://dishakewalramani.com
 Description: Bespoke residential and commercial quiet luxury interior design studio WordPress theme. Fully responsive, clean, and Elementor compatible.
-Version: 1.0.0
+Version: 1.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: disha-kewalramani-theme
@@ -99,26 +99,27 @@ img {
 }
 
 /* ==========================================================================
-   3. UTILITY CLASSES & COLOR SYSTEM
+   3. UTILITY CLASSES & COLOR SYSTEM FALLBACKS
    ========================================================================== */
-.bg-studio-beige { background-color: var(--color-studio-beige); }
-.bg-studio-terracotta { background-color: var(--color-studio-terracotta); }
-.bg-studio-offwhite { background-color: var(--color-studio-offwhite); }
-.bg-studio-charcoal { background-color: var(--color-studio-charcoal); }
+.bg-studio-beige { background-color: var(--color-studio-beige) !important; }
+.bg-studio-terracotta { background-color: var(--color-studio-terracotta) !important; }
+.bg-studio-offwhite { background-color: var(--color-studio-offwhite) !important; }
+.bg-studio-charcoal { background-color: var(--color-studio-charcoal) !important; }
 
-.text-studio-beige { color: var(--color-studio-beige); }
-.text-studio-terracotta { color: var(--color-studio-terracotta); }
-.text-studio-offwhite { color: var(--color-studio-offwhite); }
-.text-studio-charcoal { color: var(--color-studio-charcoal); }
+.text-studio-beige { color: var(--color-studio-beige) !important; }
+.text-studio-terracotta { color: var(--color-studio-terracotta) !important; }
+.text-studio-offwhite { color: var(--color-studio-offwhite) !important; }
+.text-studio-charcoal { color: var(--color-studio-charcoal) !important; }
 
-.border-studio-charcoal-10 { border-color: rgba(42, 42, 42, 0.1); }
-.border-studio-terracotta { border-color: var(--color-studio-terracotta); }
+.border-studio-charcoal-10 { border-color: rgba(42, 42, 42, 0.1) !important; }
+.border-studio-terracotta { border-color: var(--color-studio-terracotta) !important; }
 
 /* Layout Containers */
 .site-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .theme-container {
@@ -315,7 +316,6 @@ img {
 /* ==========================================================================
    6. PORTFOLIO & SECTIONS STYLING
    ========================================================================== */
-/* Portfolio grid layout */
 .portfolio-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -332,7 +332,6 @@ img {
   .portfolio-col-8 { grid-column: span 8 / span 8; grid-column-start: 3; transform: translateY(3rem); }
 }
 
-/* Process step handles */
 .process-node-circle {
   height: 3.5rem;
   width: 3.5rem;
@@ -349,7 +348,6 @@ img {
 /* ==========================================================================
    7. ELEMENTOR COMPATIBILITY & FORM STYLING
    ========================================================================== */
-/* Ensure full compatibility with Elementor Canvas and Page Templates */
 .elementor-page .site-content {
   width: 100%;
   max-width: 100%;
@@ -361,7 +359,6 @@ img {
   box-sizing: border-box;
 }
 
-/* Form input elements */
 input[type="text"],
 input[type="email"],
 select,
@@ -382,7 +379,6 @@ textarea:focus {
   border-color: var(--color-studio-terracotta);
 }
 
-/* Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
