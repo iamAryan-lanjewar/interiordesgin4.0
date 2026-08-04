@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import LazyMap from "@/components/LazyMap";
 import { 
   ArrowRight, 
   Menu, 
@@ -49,6 +51,15 @@ const PROJECTS = [
     location: "Nagpur",
     year: "2024",
     image: "/images/project-villa.png"
+  },
+  {
+    id: "proj-4",
+    title: "Curated Silhouette & Living Lounge",
+    category: "styling",
+    subtitle: "Minimalist Art & Tactile Curation",
+    location: "Nagpur",
+    year: "2024",
+    image: "/images/project-styling.jpg"
   }
 ];
 
@@ -406,24 +417,33 @@ I would like to start a project journey with you! Here are my inquiry details:
             <div className="absolute inset-0 bg-gradient-to-r from-studio-beige via-studio-beige/60 to-transparent md:from-studio-beige md:via-studio-beige/10" />
           </div>
 
-          <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 z-10">
+          <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 z-10 pb-12 sm:pb-0">
             <div className="max-w-2xl md:max-w-xl animate-fade-in-up">
-              <span className="text-xs tracking-[0.3em] font-medium text-studio-terracotta uppercase">
+              {/* Desktop only category tag (erased on mobile) */}
+              <span className="hidden sm:inline-block text-xs tracking-[0.3em] font-medium text-studio-terracotta uppercase">
                 INTERIOR DESIGN
               </span>
               
-              <h1 className="mt-6 font-serif text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.15] text-studio-charcoal">
-                Creating timeless spaces with warmth, elegance and thoughtful details.
+              <h1 className="mt-2 sm:mt-6 font-serif font-light leading-[1.15] text-studio-charcoal">
+                {/* Mobile application tagline: textured terracotta gradient, moved 2 inches higher */}
+                <span className="block sm:hidden text-3xl sm:text-4xl font-serif font-bold bg-gradient-to-r from-studio-terracotta via-[#8C3A27] to-studio-charcoal bg-clip-text text-transparent mb-10 transform -translate-y-28 drop-shadow-sm">
+                  This is your space
+                </span>
+                {/* Desktop computer headline */}
+                <span className="hidden sm:block text-4xl sm:text-5xl lg:text-6xl font-light">
+                  Creating timeless spaces with warmth, elegance and thoughtful details.
+                </span>
               </h1>
               
-              <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-8">
+              <div className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-8">
                 <a 
                   href="#projects" 
                   onClick={(e) => handleScroll(e, "projects")}
-                  className="group inline-flex items-center gap-3 text-xs tracking-[0.2em] font-semibold text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300"
+                  className="group inline-flex items-center gap-3 text-xs tracking-[0.2em] font-semibold text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300 transform translate-y-12 sm:translate-y-0"
                   id="hero-cta-btn"
                 >
-                  VIEW PORTFOLIO 
+                  <span className="inline sm:hidden">SCROLL</span>
+                  <span className="hidden sm:inline">VIEW PORTFOLIO</span>
                   <ArrowRight className="h-4 w-4 stroke-[1.5] transform group-hover:translate-x-2 transition-transform duration-300 text-studio-terracotta" />
                 </a>
                 
@@ -548,20 +568,17 @@ I would like to start a project journey with you! Here are my inquiry details:
               </div>
               
               {/* Filter tabs */}
-              <div className="flex flex-wrap items-center gap-6 sm:gap-8 text-xs tracking-widest font-light text-studio-charcoal/60">
+              <div className="flex flex-wrap items-center gap-8 md:gap-14 text-xs tracking-[0.25em] font-light text-studio-charcoal/60 uppercase">
                 {["all", "residential", "commercial", "styling"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveFilter(cat)}
-                    className={`uppercase transition-colors duration-300 relative py-1 hover:text-studio-charcoal ${
+                    className={`transition-colors duration-300 relative py-1 hover:text-studio-charcoal ${
                       activeFilter === cat ? "text-studio-terracotta font-medium" : ""
                     }`}
                     id={`filter-${cat}`}
                   >
                     {cat}
-                    {activeFilter === cat && (
-                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-studio-terracotta animate-pulse" />
-                    )}
                   </button>
                 ))}
               </div>
@@ -571,11 +588,11 @@ I would like to start a project journey with you! Here are my inquiry details:
             <div className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
               
               {filteredProjects.map((project, idx) => {
-                // Determine styling based on asymmetric indexes to give standard editorial layout
-                let gridClasses = "md:col-span-6";
-                if (idx === 0) gridClasses = "md:col-span-7 md:translate-y-0";
-                if (idx === 1) gridClasses = "md:col-span-5 md:translate-y-8";
-                if (idx === 2) gridClasses = "md:col-span-8 md:col-start-3 md:translate-y-12";
+                // Determine styling: pair 1st & 2nd in Row 1, 3rd & 4th in Row 2 (big 7-col + small 5-col offset)
+                let gridClasses = "md:col-span-7 md:translate-y-0";
+                if (idx % 2 === 1) {
+                  gridClasses = "md:col-span-5 md:translate-y-8";
+                }
 
                 return (
                   <article 
@@ -583,7 +600,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                     className={`${gridClasses} group flex flex-col bg-transparent`}
                   >
                     <div className={`relative w-full border border-studio-charcoal/5 shadow-sm overflow-hidden ${
-                      idx === 1 ? "aspect-[4/5]" : "aspect-square"
+                      idx % 2 === 1 ? "aspect-[4/5]" : "aspect-square"
                     }`}>
                       <Image 
                         src={project.image} 
@@ -623,14 +640,14 @@ I would like to start a project journey with you! Here are my inquiry details:
 
             {/* View Full Portfolio Button */}
             <div className="mt-28 flex justify-center">
-              <a 
-                href="#contact"
-                onClick={(e) => handleScroll(e, "contact")}
+              <Link 
+                href="/projects"
                 className="group relative inline-flex items-center gap-3 px-8 py-4 border border-studio-charcoal/25 bg-transparent text-xs tracking-widest text-studio-charcoal hover:border-studio-terracotta hover:text-studio-terracotta transition-all duration-300 overflow-hidden"
+                id="view-all-projects-btn"
               >
                 <span>VIEW ALL PROJECTS</span>
                 <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1.5 transition-transform duration-300 text-studio-terracotta" />
-              </a>
+              </Link>
             </div>
 
           </div>
@@ -656,10 +673,10 @@ I would like to start a project journey with you! Here are my inquiry details:
               </p>
             </div>
 
-            {/* Desktop timeline nodes */}
-            <div className="hidden lg:grid grid-cols-4 gap-8 relative reveal-element reveal-text-up">
+            {/* Unified Clean Aesthetic Step Selector (Mobile & Desktop) */}
+            <div className="grid grid-cols-4 gap-3 sm:gap-8 relative reveal-element reveal-text-up max-w-4xl mx-auto">
               {/* Dotted connecting line background */}
-              <div className="absolute top-[28px] left-[12.5%] right-[12.5%] h-[1px] process-line" />
+              <div className="absolute top-[24px] sm:top-[28px] left-[12.5%] right-[12.5%] h-[1px] process-line" />
               
               {PROCESS_STEPS.map((step, idx) => (
                 <button
@@ -669,21 +686,22 @@ I would like to start a project journey with you! Here are my inquiry details:
                   id={`process-node-${idx}`}
                 >
                   {/* Circle step handle */}
-                  <div className={`h-14 w-14 rounded-full flex items-center justify-center border transition-all duration-500 ${
+                  <div className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border transition-all duration-300 ${
                     activeStep === idx 
-                      ? "border-studio-terracotta bg-studio-terracotta text-studio-offwhite shadow-md scale-110" 
-                      : "border-studio-charcoal/20 bg-studio-offwhite text-studio-charcoal/60 group-hover:border-studio-charcoal group-hover:text-studio-charcoal"
+                      ? "border-studio-terracotta bg-studio-terracotta text-studio-offwhite shadow-md scale-105" 
+                      : "border-studio-charcoal/20 bg-studio-beige text-studio-charcoal/60 group-hover:border-studio-charcoal group-hover:text-studio-charcoal"
                   }`}>
-                    <span className="font-serif text-sm font-medium">{step.number}</span>
+                    <span className="font-serif text-xs sm:text-sm font-medium">{step.number}</span>
                   </div>
                   
-                  <h3 className={`mt-6 font-serif text-lg font-medium transition-colors ${
-                    activeStep === idx ? "text-studio-terracotta" : "text-studio-charcoal/80"
+                  <h3 className={`mt-3 sm:mt-6 font-serif text-xs sm:text-lg font-medium transition-colors ${
+                    activeStep === idx ? "text-studio-terracotta font-medium" : "text-studio-charcoal/70"
                   }`}>
-                    {step.title}
+                    <span className="hidden sm:inline">{step.title}</span>
+                    <span className="inline sm:hidden">{step.title.split(" ")[0]}</span>
                   </h3>
                   
-                  <span className="text-[10px] tracking-widest text-studio-charcoal/40 uppercase mt-1">
+                  <span className="hidden sm:block text-[10px] tracking-widest text-studio-charcoal/40 uppercase mt-1">
                     {step.tagline}
                   </span>
                 </button>
@@ -691,55 +709,27 @@ I would like to start a project journey with you! Here are my inquiry details:
             </div>
 
             {/* Interactive Timeline Detail Box */}
-            <div className="mt-12 lg:mt-16 mx-auto max-w-4xl bg-studio-beige border border-studio-charcoal/10 p-8 md:p-12 shadow-sm rounded-sm reveal-element reveal-text-up">
-              {/* Mobile steps controller */}
-              <div className="flex lg:hidden justify-between items-center border-b border-studio-charcoal/10 pb-6 mb-6">
-                <button
-                  onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}
-                  disabled={activeStep === 0}
-                  className="p-2 border border-studio-charcoal/10 hover:border-studio-terracotta disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                  aria-label="Previous step"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <div className="text-center">
-                  <span className="text-xs text-studio-terracotta font-serif font-semibold uppercase tracking-wider block">
-                    STEP {PROCESS_STEPS[activeStep].number}
-                  </span>
-                  <span className="font-serif text-base text-studio-charcoal">
-                    {PROCESS_STEPS[activeStep].title}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setActiveStep(prev => Math.min(PROCESS_STEPS.length - 1, prev + 1))}
-                  disabled={activeStep === PROCESS_STEPS.length - 1}
-                  className="p-2 border border-studio-charcoal/10 hover:border-studio-terracotta disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                  aria-label="Next step"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            <div className="mt-10 lg:mt-16 mx-auto max-w-4xl bg-studio-beige border border-studio-charcoal/10 p-6 sm:p-8 md:p-12 shadow-sm rounded-sm reveal-element reveal-text-up">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
                 <div className="md:col-span-3 flex flex-col md:border-r border-studio-charcoal/10 md:pr-8 h-full justify-between">
-                  <div className="hidden lg:block text-studio-terracotta font-serif text-6xl font-extralight tracking-tighter">
+                  <div className="text-studio-terracotta font-serif text-4xl sm:text-6xl font-extralight tracking-tighter">
                     {PROCESS_STEPS[activeStep].number}
                   </div>
-                  <div>
-                    <span className="text-xs text-studio-terracotta font-medium tracking-widest uppercase block mb-1">
-                      focus
+                  <div className="mt-2 md:mt-0">
+                    <span className="text-[10px] sm:text-xs text-studio-terracotta font-medium tracking-widest uppercase block mb-0.5">
+                      FOCUS
                     </span>
-                    <span className="font-serif text-lg text-studio-charcoal font-medium">
+                    <span className="font-serif text-base sm:text-lg text-studio-charcoal font-medium">
                       {PROCESS_STEPS[activeStep].tagline}
                     </span>
                   </div>
                 </div>
 
                 <div className="md:col-span-9 md:pl-4">
-                  <h4 className="hidden lg:block font-serif text-2xl font-light text-studio-charcoal mb-4">
+                  <h4 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal mb-3">
                     {PROCESS_STEPS[activeStep].title}
                   </h4>
-                  <p className="text-sm md:text-base font-light text-studio-charcoal/70 leading-relaxed">
+                  <p className="text-xs sm:text-sm md:text-base font-light text-studio-charcoal/70 leading-relaxed">
                     {PROCESS_STEPS[activeStep].description}
                   </p>
                 </div>
@@ -1032,21 +1022,8 @@ I would like to start a project journey with you! Here are my inquiry details:
                   </div>
                 </div>
 
-                {/* High-end Styled Map Frame */}
-                <div className="w-full aspect-[4/3] border border-studio-charcoal/10 overflow-hidden relative shadow-sm">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.0886191632734!2d79.08581781538743!3d21.188737385913217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c114f7b2c7e9%3A0xe54fb7144be7d94f!2sLakhwani%20Hall%2C%20Jaripatka%2C%20Nagpur!5e0!3m2!1sen!2sin!4v1689999999999!5m2!1sen!2sin"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Disha A Kewalramani Studio Location Map"
-                    className="grayscale contrast-125 opacity-75 invert hover:opacity-100 duration-500 transition-opacity"
-                    id="map-embed-frame"
-                  ></iframe>
-                </div>
+                {/* High-end Fast Loading Styled Map Frame */}
+                <LazyMap />
 
               </div>
 
