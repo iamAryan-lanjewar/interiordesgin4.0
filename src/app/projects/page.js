@@ -185,7 +185,7 @@ export default function ProjectsPage() {
             className="font-serif text-xl sm:text-2xl font-light tracking-wide text-studio-charcoal hover:opacity-80 transition-opacity"
             id="brand-logo-projects"
           >
-            Disha A Kewalramani
+            Patil Associates
           </Link>
 
           {/* Desktop Navigation */}
@@ -234,7 +234,7 @@ export default function ProjectsPage() {
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-serif text-lg text-studio-charcoal/80">Disha A K.</span>
+            <span className="font-serif text-lg text-studio-charcoal/80">Patil Associates</span>
             <button 
               onClick={() => setMenuOpen(false)} 
               className="text-studio-charcoal hover:text-studio-terracotta transition-colors"
@@ -328,7 +328,7 @@ export default function ProjectsPage() {
                       <div className={`relative w-full overflow-hidden ${item.aspectRatio}`}>
                         <Image
                           src={item.image}
-                          alt={item.title}
+                          alt={`${item.title} — ${item.subtitle} | Patil Associates Luxury Interior Portfolio Nagpur`}
                           fill
                           sizes="(max-width: 768px) 100vw, 600px"
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
@@ -370,7 +370,7 @@ export default function ProjectsPage() {
                       <div className={`relative w-full overflow-hidden ${item.aspectRatio}`}>
                         <Image
                           src={item.image}
-                          alt={item.title}
+                          alt={`${item.title} — ${item.subtitle} | Patil Associates Luxury Interior Portfolio Nagpur`}
                           fill
                           sizes="(max-width: 768px) 100vw, 600px"
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
@@ -409,20 +409,16 @@ export default function ProjectsPage() {
 
         {/* 4. LIGHTBOX MODAL */}
         {lightboxIndex !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-studio-charcoal/95 backdrop-blur-md p-4 sm:p-8 animate-fade-in-up">
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-studio-charcoal/95 backdrop-blur-md p-4 sm:p-8 animate-fade-in-up">
             
-            {/* Top Bar: Counter & Close */}
-            <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-studio-offwhite/80 z-20">
-              <span className="text-xs tracking-widest font-light">
-                {String(lightboxIndex + 1).padStart(2, '0')} / {String(currentImagesList.length).padStart(2, '0')}
+            {/* Top Bar: Counter only — no close button */}
+            <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-studio-offwhite/50 z-20">
+              <span className="text-[10px] tracking-[0.3em] uppercase font-light">
+                Studio Archive &nbsp;·&nbsp; {String(lightboxIndex + 1).padStart(2, '0')} of {String(currentImagesList.length).padStart(2, '0')}
               </span>
-              <button
-                onClick={closeLightbox}
-                className="p-2 text-studio-offwhite/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Close Lightbox"
-              >
-                <X className="h-6 w-6 stroke-[1.5]" />
-              </button>
+              <span className="text-[10px] tracking-[0.25em] uppercase font-light hidden sm:block">
+                Press <kbd className="px-1.5 py-0.5 bg-studio-offwhite/10 rounded text-studio-offwhite/60 font-mono text-[9px]">ESC</kbd> to exit &nbsp;·&nbsp; Arrow keys to navigate
+              </span>
             </div>
 
             {/* Left Navigation Arrow */}
@@ -435,11 +431,11 @@ export default function ProjectsPage() {
             </button>
 
             {/* Main Lightbox Image Frame */}
-            <div className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center p-2 sm:p-6">
-              <div className="relative w-full h-full max-h-[80vh] aspect-[4/5] sm:aspect-auto">
+            <div className="relative max-w-5xl max-h-[72vh] w-full h-full flex items-center justify-center p-2 sm:p-6">
+              <div className="relative w-full h-full max-h-[68vh] aspect-[4/5] sm:aspect-auto">
                 <Image
                   src={currentImagesList[lightboxIndex].image}
-                  alt="Expanded high-resolution project view"
+                  alt={`${currentImagesList[lightboxIndex].title} — High Resolution Interior Project View | Patil Associates`}
                   fill
                   priority
                   className="object-contain drop-shadow-2xl"
@@ -455,6 +451,26 @@ export default function ProjectsPage() {
             >
               <ChevronRight className="h-8 w-8 stroke-[1.5]" />
             </button>
+
+            {/* Bottom Description Panel */}
+            <div className="relative z-20 mt-2 sm:mt-4 w-full max-w-3xl text-center px-6">
+              <div className="border-t border-studio-offwhite/10 pt-4 sm:pt-5">
+                <span className="text-[9px] tracking-[0.35em] text-studio-terracotta uppercase font-medium block mb-1.5">
+                  {currentImagesList[lightboxIndex].category} &nbsp;·&nbsp; Patil Associates
+                </span>
+                <h2 className="font-serif text-lg sm:text-2xl font-light text-studio-offwhite leading-snug mb-2">
+                  {currentImagesList[lightboxIndex].title}
+                </h2>
+                <p className="text-xs sm:text-sm font-light text-studio-offwhite/50 leading-relaxed max-w-xl mx-auto italic">
+                  Every space we craft carries a silent conversation between light and shadow, texture and void. 
+                  This work embodies our belief that true luxury whispers — it never shouts.
+                </p>
+                <p className="mt-2 text-[10px] tracking-widest text-studio-offwhite/30 uppercase">
+                  {currentImagesList[lightboxIndex].subtitle}
+                </p>
+              </div>
+            </div>
+
           </div>
         )}
       </main>
@@ -466,7 +482,7 @@ export default function ProjectsPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-studio-offwhite/10 pb-12">
             <div>
               <span className="font-serif text-2xl font-light tracking-wide text-studio-offwhite block">
-                Disha A Kewalramani
+                Patil Associates
               </span>
               <span className="text-xs text-studio-offwhite/60 tracking-widest uppercase block mt-1">
                 Luxury Interior Design Studio • Nagpur, India
@@ -475,7 +491,7 @@ export default function ProjectsPage() {
 
             <div className="flex items-center space-x-6 text-studio-offwhite/80">
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/showw_up/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="hover:text-studio-terracotta transition-colors p-2"
@@ -496,7 +512,7 @@ export default function ProjectsPage() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-studio-offwhite/50 tracking-wider">
-            <span>© {new Date().getFullYear()} Disha A Kewalramani. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Patil Associates. All rights reserved.</span>
             <Link href="/" className="hover:text-studio-offwhite transition-colors mt-4 sm:mt-0">
               Return to Home Page ↑
             </Link>

@@ -94,12 +94,12 @@ const PROCESS_STEPS = [
 // Client Testimonials Data
 const TESTIMONIALS = [
   {
-    quote: "Disha has an incredible ability to blend raw aesthetics with functionality. Our home feels warm, elegant, and truly reflects our family's personality. Every corner tells a quiet, beautiful story.",
+    quote: "Patil Associates has an incredible ability to blend raw aesthetics with functionality. Our home feels warm, elegant, and truly reflects our family's personality. Every corner tells a quiet, beautiful story.",
     author: "THE RAJ FAMILY",
     location: "Nagpur"
   },
   {
-    quote: "Working with Disha A Kewalramani was an absolute pleasure. Her architectural understanding and emphasis on textures rather than clutter transformed our corporate workspace into a serene, inspiring oasis.",
+    quote: "Working with Patil Associates was an absolute pleasure. Their architectural understanding and emphasis on textures rather than clutter transformed our corporate workspace into a serene, inspiring oasis.",
     author: "MEHTA ASSOCIATES",
     location: "Nagpur"
   },
@@ -131,6 +131,24 @@ export default function Home() {
   const [formMessage, setFormMessage] = useState("");
   const [formStatus, setFormStatus] = useState("idle"); // idle, loading, success, error
   const [formErrorMsg, setFormErrorMsg] = useState("");
+
+  // Top overlay inquiry state (1-time display per visit session)
+  const [showInquiryOverlay, setShowInquiryOverlay] = useState(false);
+
+  useEffect(() => {
+    // Check if user has already dismissed the top overlay in this session
+    const isDismissed = typeof window !== "undefined" ? sessionStorage.getItem("inquiry_dismissed") : "true";
+    if (!isDismissed) {
+      setShowInquiryOverlay(true);
+    }
+  }, []);
+
+  const handleDismissOverlay = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("inquiry_dismissed", "true");
+    }
+    setShowInquiryOverlay(false);
+  };
 
   // Auto-play testimonial slider
   useEffect(() => {
@@ -189,7 +207,6 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Send custom requested header for anti-CSRF check
           "X-Requested-With": "XMLHttpRequest"
         },
         body: JSON.stringify({
@@ -205,8 +222,10 @@ export default function Home() {
 
       if (response.ok) {
         setFormStatus("success");
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("inquiry_dismissed", "true");
+        }
 
-        // Format parameters for WhatsApp redirection to enhance UX
         const projectTypeLabels = {
           residential: "Residential Design",
           commercial: "Commercial Workspace",
@@ -223,7 +242,7 @@ export default function Home() {
         const projectLabel = projectTypeLabels[formProjectType] || formProjectType;
         const budgetLabel = budgetLabels[formBudgetRange] || formBudgetRange;
 
-        const waText = `Hello Disha A Kewalramani,
+        const waText = `Hello Patil Associates,
 
 I would like to start a project journey with you! Here are my inquiry details:
 
@@ -236,7 +255,6 @@ I would like to start a project journey with you! Here are my inquiry details:
         const whatsappUrl = `https://wa.me/919823577149?text=${encodeURIComponent(waText)}`;
         window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
-        // Reset fields
         setFormName("");
         setFormEmail("");
         setFormProjectType("residential");
@@ -253,7 +271,180 @@ I would like to start a project journey with you! Here are my inquiry details:
   };
 
   return (
-    <div className="flex-1 flex flex-col font-sans selection:bg-studio-terracotta selection:text-studio-offwhite">
+    <div className="flex-1 flex flex-col font-sans selection:bg-studio-terracotta selection:text-studio-offwhite relative">
+
+      {/* 1. TOP OVERLAY INQUIRY FORM LAYER (1-Time Display Per Visit Session) */}
+      {showInquiryOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-studio-charcoal/75 backdrop-blur-md transition-opacity duration-300">
+          <div className="relative w-full max-w-2xl bg-studio-beige border border-studio-charcoal/20 shadow-2xl p-6 sm:p-8 md:p-10 rounded-none text-studio-charcoal max-h-[90vh] overflow-y-auto">
+            
+            {/* Top Bar — label only, no close button */}
+            <div className="flex items-center justify-between border-b border-studio-charcoal/10 pb-4 mb-6">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-studio-terracotta animate-pulse" />
+                <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
+                  PATIL ASSOCIATES INQUIRY
+                </span>
+              </div>
+              <span className="text-[10px] tracking-widest text-studio-charcoal/30 uppercase hidden sm:block">
+                Nagpur · Est. 2018
+              </span>
+            </div>
+
+            {/* Header Content */}
+            <div className="mb-6">
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-studio-charcoal leading-snug">
+                Transform Your Space into a Living Masterpiece
+              </h2>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+              
+              {/* Status notifications */}
+              {formStatus === "success" && (
+                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 shrink-0 text-emerald-600" />
+                    <span>Thank you! Your inquiry has been received. Redirecting to WhatsApp...</span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={handleDismissOverlay} 
+                    className="underline text-xs shrink-0 font-medium"
+                  >
+                    View Website
+                  </button>
+                </div>
+              )}
+
+              {formStatus === "error" && (
+                <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm">
+                  <p className="font-semibold">Submission failed:</p>
+                  <p className="mt-1">{formErrorMsg}</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="overlay-form-name" className="block text-[11px] uppercase tracking-wider text-studio-charcoal/70 mb-1.5 font-medium">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="overlay-form-name"
+                    required
+                    maxLength={100}
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full bg-studio-offwhite border border-studio-charcoal/15 px-3.5 py-2.5 text-sm focus:outline-none focus:border-studio-terracotta transition-colors text-studio-charcoal"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="overlay-form-email" className="block text-[11px] uppercase tracking-wider text-studio-charcoal/70 mb-1.5 font-medium">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    id="overlay-form-email"
+                    required
+                    maxLength={100}
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    placeholder="john@example.com"
+                    className="w-full bg-studio-offwhite border border-studio-charcoal/15 px-3.5 py-2.5 text-sm focus:outline-none focus:border-studio-terracotta transition-colors text-studio-charcoal"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="overlay-form-project-type" className="block text-[11px] uppercase tracking-wider text-studio-charcoal/70 mb-1.5 font-medium">
+                    Project Type *
+                  </label>
+                  <select
+                    id="overlay-form-project-type"
+                    value={formProjectType}
+                    onChange={(e) => setFormProjectType(e.target.value)}
+                    className="w-full bg-studio-offwhite border border-studio-charcoal/15 px-3.5 py-2.5 text-sm focus:outline-none focus:border-studio-terracotta transition-colors text-studio-charcoal"
+                  >
+                    <option value="residential">Residential Design</option>
+                    <option value="commercial">Commercial Workspace</option>
+                    <option value="styling">Styling & Art Curation</option>
+                    <option value="other">Other Space Planning</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="overlay-form-budget" className="block text-[11px] uppercase tracking-wider text-studio-charcoal/70 mb-1.5 font-medium">
+                    Budget Range *
+                  </label>
+                  <select
+                    id="overlay-form-budget"
+                    value={formBudgetRange}
+                    onChange={(e) => setFormBudgetRange(e.target.value)}
+                    className="w-full bg-studio-offwhite border border-studio-charcoal/15 px-3.5 py-2.5 text-sm focus:outline-none focus:border-studio-terracotta transition-colors text-studio-charcoal"
+                  >
+                    <option value="budget-1">₹5L – ₹15L (INR)</option>
+                    <option value="budget-2">₹15L – ₹50L (INR)</option>
+                    <option value="budget-3">₹50L – ₹1.5Cr (INR)</option>
+                    <option value="budget-4">Over ₹1.5Cr (INR)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="overlay-form-message" className="block text-[11px] uppercase tracking-wider text-studio-charcoal/70 mb-1.5 font-medium">
+                  Your Message *
+                </label>
+                <textarea
+                  id="overlay-form-message"
+                  required
+                  maxLength={1000}
+                  rows={3}
+                  value={formMessage}
+                  onChange={(e) => setFormMessage(e.target.value)}
+                  placeholder="Tell us about your space, location, timeline, or requirements..."
+                  className="w-full bg-studio-offwhite border border-studio-charcoal/15 px-3.5 py-2.5 text-sm focus:outline-none focus:border-studio-terracotta transition-colors text-studio-charcoal resize-none"
+                />
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-studio-charcoal/10">
+                <button
+                  type="submit"
+                  disabled={formStatus === "loading"}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-studio-terracotta text-studio-offwhite px-7 py-3 text-xs tracking-widest font-semibold hover:bg-studio-charcoal transition-colors duration-300 disabled:opacity-50"
+                  id="overlay-submit-btn"
+                >
+                  {formStatus === "loading" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>SUBMITTING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>SUBMIT INQUIRY</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDismissOverlay}
+                  className="text-xs tracking-wider text-studio-charcoal/50 hover:text-studio-charcoal/80 underline underline-offset-4 transition-colors"
+                >
+                  Explore our portfolio first →
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
       
       {/* 2. SITE NAVIGATION & HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-studio-charcoal/10 bg-studio-beige/85 backdrop-blur-md transition-all duration-300">
@@ -266,7 +457,7 @@ I would like to start a project journey with you! Here are my inquiry details:
             className="font-serif text-xl sm:text-2xl font-light tracking-wide text-studio-charcoal hover:opacity-80 transition-opacity"
             id="brand-logo"
           >
-            Disha A Kewalramani
+            Patil Associates
           </a>
 
           {/* Desktop Menu Link list */}
@@ -337,7 +528,7 @@ I would like to start a project journey with you! Here are my inquiry details:
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-serif text-lg text-studio-charcoal/80">Disha A K.</span>
+            <span className="font-serif text-lg text-studio-charcoal/80">Patil Associates</span>
             <button 
               onClick={() => setMenuOpen(false)} 
               className="text-studio-charcoal hover:text-studio-terracotta transition-colors"
@@ -402,56 +593,66 @@ I would like to start a project journey with you! Here are my inquiry details:
         {/* Section 1: Hero Section */}
         <section 
           id="hero" 
-          className="relative min-h-[90vh] flex flex-col justify-end bg-studio-beige py-12 md:py-20 lg:py-28"
+          className="relative min-h-[90vh] flex flex-col justify-end bg-studio-beige py-14 md:py-20 lg:py-28"
         >
           {/* Half-bleed Hero Visual Layer */}
           <div className="absolute inset-0 md:left-1/3 overflow-hidden">
             <Image 
               src="/images/hero-interior.png" 
-              alt="Serene modern luxury living room by Disha A Kewalramani" 
+              alt="Serene modern luxury living room by Patil Associates" 
               fill
               priority
-              className="object-cover object-center opacity-90 brightness-95"
+              className="object-cover object-center opacity-95 brightness-100"
             />
             {/* Subtle soft plaster gradient filter */}
-            <div className="absolute inset-0 bg-gradient-to-r from-studio-beige via-studio-beige/60 to-transparent md:from-studio-beige md:via-studio-beige/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-studio-beige/85 via-studio-beige/25 to-transparent md:bg-gradient-to-r md:from-studio-beige md:via-studio-beige/60 md:to-transparent" />
           </div>
 
-          <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 z-10 pb-12 sm:pb-0">
+          <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 z-10 pb-8 sm:pb-0">
             <div className="max-w-2xl md:max-w-xl animate-fade-in-up">
-              {/* Desktop only category tag (erased on mobile) */}
-              <span className="hidden sm:inline-block text-xs tracking-[0.3em] font-medium text-studio-terracotta uppercase">
-                INTERIOR DESIGN
-              </span>
               
-              <h1 className="mt-2 sm:mt-6 font-serif font-light leading-[1.15] text-studio-charcoal">
-                {/* Mobile application tagline: textured terracotta gradient, moved 2 inches higher */}
-                <span className="block sm:hidden text-3xl sm:text-4xl font-serif font-bold bg-gradient-to-r from-studio-terracotta via-[#8C3A27] to-studio-charcoal bg-clip-text text-transparent mb-10 transform -translate-y-28 drop-shadow-sm">
-                  This is your space
+              {/* Selected Text Block — Pushed up 2+ inches higher with larger aesthetic typography */}
+              <div className="transform -translate-y-72 sm:translate-y-0 transition-transform duration-300">
+                {/* Category tag */}
+                <span className="inline-block text-xs tracking-[0.35em] font-semibold text-[#8C3A27] uppercase mb-3 sm:mb-4">
+                  INTERIOR DESIGN &bull; NAGPUR
                 </span>
-                {/* Desktop computer headline */}
-                <span className="hidden sm:block text-4xl sm:text-5xl lg:text-6xl font-light">
+                
+                {/* Desktop Headline */}
+                <h1 className="hidden sm:block font-serif text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.15] text-[#111111]">
                   Creating timeless spaces with warmth, elegance and thoughtful details.
-                </span>
-              </h1>
+                </h1>
+
+                {/* Mobile Headline & Description */}
+                <div className="block sm:hidden">
+                  <h1 className="font-serif text-[3.25rem] font-normal leading-[1.04] text-[#111111] drop-shadow-sm">
+                    This is your space
+                  </h1>
+                  {/* Mobile-only description */}
+                  <p className="mt-3.5 text-2xl font-normal tracking-wide text-[#1c1c1c] italic font-serif">
+                    Craft with craftsmanship
+                  </p>
+                </div>
+              </div>
               
-              <div className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-8">
+              {/* CTA and Scroll Links */}
+              <div className="mt-6 sm:mt-12 flex items-center gap-6 sm:gap-8">
                 <a 
                   href="#projects" 
                   onClick={(e) => handleScroll(e, "projects")}
-                  className="group inline-flex items-center gap-3 text-xs tracking-[0.2em] font-semibold text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300 transform translate-y-12 sm:translate-y-0"
+                  className="group inline-flex items-center gap-2.5 text-xs sm:text-sm tracking-[0.2em] font-semibold text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300"
                   id="hero-cta-btn"
                 >
-                  <span className="inline sm:hidden">SCROLL</span>
+                  <span className="inline sm:hidden">EXPLORE WORK</span>
                   <span className="hidden sm:inline">VIEW PORTFOLIO</span>
                   <ArrowRight className="h-4 w-4 stroke-[1.5] transform group-hover:translate-x-2 transition-transform duration-300 text-studio-terracotta" />
                 </a>
                 
                 {/* Scroll Indicator */}
                 <a 
-                  href="#about"
+                  href="#about" 
                   onClick={(e) => handleScroll(e, "about")}
-                  className="hidden sm:inline-flex items-center text-[10px] tracking-[0.2em] font-light text-studio-charcoal/40 hover:text-studio-charcoal/80 transition-colors"
+                  className="inline-flex items-center text-xs tracking-[0.2em] font-light text-studio-charcoal/50 hover:text-studio-charcoal/80 transition-colors"
                 >
                   SCROLL TO DISCOVER
                 </a>
@@ -474,7 +675,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                 <div className="relative overflow-hidden aspect-[3/4] max-w-md mx-auto shadow-sm border border-studio-charcoal/5">
                   <Image 
                     src="/images/project-chair.jpg" 
-                    alt="Bespoke handcrafted chair by Disha A Kewalramani" 
+                    alt="Bespoke handcrafted chair by Patil Associates" 
                     fill
                     sizes="(max-width: 768px) 100vw, 400px"
                     className="object-cover"
@@ -493,7 +694,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                 </h2>
                 
                 <p className="mt-6 text-base md:text-lg leading-relaxed font-light text-studio-charcoal/70">
-                  Based out of Nagpur, studio Disha A Kewalramani curates bespoke residential and commercial environments where functionality meets quiet luxury. We believe that true sophistication lies in the balance of light, line, and organic texture.
+                  Based out of Nagpur, studio Patil Associates curates bespoke residential and commercial environments where functionality meets quiet luxury. We believe that true sophistication lies in the balance of light, line, and organic texture.
                 </p>
 
                 {/* Read More button */}
@@ -604,7 +805,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                     }`}>
                       <Image 
                         src={project.image} 
-                        alt={project.title} 
+                        alt={`${project.title} — ${project.subtitle} by Patil Associates Interior Studio Nagpur`} 
                         fill
                         sizes="(max-width: 768px) 100vw, 600px"
                         className="object-cover"
@@ -985,7 +1186,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                       <div>
                         <span className="font-medium text-studio-charcoal block">Nagpur Head Office</span>
                         <p className="mt-1 font-light text-studio-charcoal/70 leading-relaxed">
-                          Near Lakhwani Hall, Jaripatka, Nagpur, Maharashtra 440014
+                          Shop No. 3, Ground, 2, Besa-Pipla Rd, Atharva Nagri 2, Manewada, Besa Pipla, Maharashtra 440037
                         </p>
                       </div>
                     </div>
@@ -1012,10 +1213,10 @@ I would like to start a project journey with you! Here are my inquiry details:
                       <div>
                         <span className="font-medium text-studio-charcoal block">Email Address</span>
                         <a 
-                          href="mailto:hello@dishakewalramani.com" 
+                          href="mailto:hello@patilassociates.com" 
                           className="mt-1 font-light text-studio-charcoal/70 hover:text-studio-terracotta transition-colors block"
                         >
-                          hello@dishakewalramani.com
+                          hello@patilassociates.com
                         </a>
                       </div>
                     </div>
@@ -1041,13 +1242,13 @@ I would like to start a project journey with you! Here are my inquiry details:
             
             {/* Logo */}
             <div className="font-serif text-xl tracking-wide text-studio-charcoal">
-              Disha A Kewalramani
+              Patil Associates
             </div>
             
             {/* Social Icons list */}
             <div className="flex items-center gap-6">
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/showw_up/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-studio-charcoal/60 hover:text-studio-terracotta transition-colors"
@@ -1070,7 +1271,7 @@ I would like to start a project journey with you! Here are my inquiry details:
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 text-[10px] tracking-widest text-studio-charcoal/40 uppercase">
             <div>
-              &copy; {new Date().getFullYear()} Disha A Kewalramani. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Patil Associates. All Rights Reserved.
             </div>
 
             <div className="flex gap-6">

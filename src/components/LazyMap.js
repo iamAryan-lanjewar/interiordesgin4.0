@@ -1,40 +1,65 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin, ExternalLink, Navigation } from "lucide-react";
 
 export default function LazyMap() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [shouldRenderIframe, setShouldRenderIframe] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
   const containerRef = useRef(null);
 
-  const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=Lakhwani+Hall+Jaripatka+Nagpur";
-  const embedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.0886191632734!2d79.08581781538743!3d21.188737385913217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c114f7b2c7e9%3A0xe54fb7144be7d94f!2sLakhwani%20Hall%2C%20Jaripatka%2C%20Nagpur!5e0!3m2!1sen!2sin!4v1689999999999!5m2!1sen!2sin";
+  const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=Shop+No.+3,+Ground,+2,+Besa-Pipla+Rd,+Atharva+Nagri+2,+Manewada,+Besa+Pipla,+Maharashtra+440037";
+  const embedUrl = "https://maps.google.com/maps?q=Shop+No.+3,+Ground,+2,+Besa-Pipla+Rd,+Atharva+Nagri+2,+Manewada,+Besa+Pipla,+Maharashtra+440037&t=&z=16&ie=UTF8&iwloc=&output=embed";
 
-  // Automatically load standard Google Map when user scrolls near the contact/map section
   useEffect(() => {
+    // 1. Preload early using wide IntersectionObserver (800px margin)
     if (!containerRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setIsLoaded(true);
+          setShouldRenderIframe(true);
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "800px" } // Starts fetching long before scrolling into view
     );
 
     observer.observe(containerRef.current);
 
-    return () => observer.disconnect();
+    // 2. Fallback: Preload automatically after 1.5s idle delay regardless of scroll position
+    const idleTimer = setTimeout(() => {
+      setShouldRenderIframe(true);
+    }, 1500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(idleTimer);
+    };
   }, []);
 
   return (
     <div 
       ref={containerRef}
-      className="w-full aspect-[4/3] border border-studio-charcoal/10 overflow-hidden relative shadow-sm bg-studio-beige/40"
+      className="w-full aspect-[4/3] border border-studio-charcoal/10 overflow-hidden relative shadow-sm bg-studio-beige/40 rounded-sm group"
     >
-      {isLoaded ? (
+      {/* Background placeholder card (shown while iframe is initializing) */}
+      <div 
+        className={`absolute inset-0 flex flex-col items-center justify-center bg-studio-beige/80 p-6 text-center transition-opacity duration-500 z-0 ${
+          iframeLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
+        <MapPin className="h-7 w-7 text-studio-terracotta mb-2 animate-pulse" />
+        <span className="font-serif text-sm text-studio-charcoal font-medium">
+          Nagpur Studio Location
+        </span>
+        <span className="text-[11px] text-studio-charcoal/60 mt-1 font-light max-w-xs">
+          Besa-Pipla Rd, Manewada, Nagpur
+        </span>
+      </div>
+
+      {/* Google Map iframe frame with fast background loading */}
+      {shouldRenderIframe && (
         <iframe
           src={embedUrl}
           width="100%"
@@ -43,27 +68,28 @@ export default function LazyMap() {
           allowFullScreen=""
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Disha A Kewalramani Studio Location Map"
-          className="w-full h-full border-0 transition-opacity duration-300"
+          title="Patil Associates Studio Location Map"
+          onLoad={() => setIframeLoaded(true)}
+          className={`w-full h-full border-0 relative z-10 transition-opacity duration-500 ${
+            iframeLoaded ? "opacity-100" : "opacity-0"
+          }`}
           id="map-embed-frame"
         />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-studio-beige/60 p-6 text-center">
-          <MapPin className="h-8 w-8 text-studio-terracotta mb-2 animate-bounce" />
-          <span className="text-xs tracking-widest text-studio-charcoal/70 uppercase font-medium">
-            Loading Google Map...
-          </span>
-          <a
-            href={googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 text-[11px] text-studio-terracotta hover:underline flex items-center gap-1"
-          >
-            <span>Open in Google Maps</span>
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        </div>
       )}
+
+      {/* Floating Action Badge to open direct directions on Google Maps */}
+      <a
+        href={googleMapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 bg-studio-beige/90 backdrop-blur-md border border-studio-charcoal/15 text-[11px] font-medium tracking-wide text-studio-charcoal hover:bg-studio-terracotta hover:text-studio-offwhite hover:border-studio-terracotta transition-all duration-300 shadow-sm rounded-sm"
+        id="open-google-maps-btn"
+      >
+        <Navigation className="h-3 w-3 text-studio-terracotta group-hover:text-studio-offwhite transition-colors" />
+        <span>Get Directions</span>
+        <ExternalLink className="h-3 w-3 opacity-60" />
+      </a>
     </div>
   );
 }
+
