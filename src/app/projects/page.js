@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
-  ArrowLeft, 
+  ArrowLeft,
+  ArrowRight,
   Menu, 
   X, 
   ChevronLeft, 
@@ -173,8 +174,8 @@ export default function ProjectsPage() {
   }, [lightboxIndex, nextImage, prevImage]);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-studio-beige text-studio-charcoal selection:bg-studio-terracotta selection:text-studio-offwhite">
-      
+    <div className="min-h-screen flex flex-col font-sans bg-studio-beige text-studio-charcoal selection:bg-studio-terracotta selection:text-studio-offwhite relative">
+
       {/* 1. HEADER & NAVIGATION */}
       <header className="sticky top-0 z-50 w-full border-b border-studio-charcoal/10 bg-studio-beige/85 backdrop-blur-md transition-all duration-300">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 sm:px-8">
@@ -244,61 +245,60 @@ export default function ProjectsPage() {
             </button>
           </div>
 
-          <nav className="flex flex-col space-y-8 my-auto text-2xl font-serif text-studio-charcoal">
+          <nav className="flex flex-col space-y-8 my-auto text-2xl font-serif text-studio-charcoal text-center items-center">
             <Link 
               href="/"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 flex items-center justify-between"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 flex items-center justify-center gap-3 w-full"
             >
-              <span>Home</span>
-              <ArrowLeft className="h-5 w-5 rotate-180 text-studio-terracotta" />
+              <ArrowLeft className="h-5 w-5 text-studio-terracotta" />
+              <span>Back to Home</span>
             </Link>
             <Link 
               href="/projects"
               onClick={() => setMenuOpen(false)}
-              className="text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 font-medium"
+              className="text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 font-medium text-center w-full"
             >
               All Projects
             </Link>
             <Link 
               href="/#contact"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 text-center w-full"
             >
               Contact & Inquiry
             </Link>
           </nav>
 
-          <div className="text-xs text-studio-charcoal/50 tracking-wider">
+          <div className="text-xs text-studio-charcoal/50 tracking-wider text-center">
             Nagpur, Maharashtra, India
           </div>
         </div>
       </div>
-
 
       {/* 2. HERO INTRO SECTION - CENTERED */}
       <main className="flex-1">
         <section className="py-12 md:py-16 bg-studio-beige border-b border-studio-charcoal/10">
           <div className="mx-auto max-w-7xl px-6 sm:px-8 text-center flex flex-col items-center">
             <div className="max-w-3xl">
-              <span className="text-xs tracking-[0.3em] font-medium text-studio-terracotta uppercase block mb-3">
+              <span className="text-xs tracking-[0.3em] font-medium text-studio-terracotta uppercase block mb-3 text-center">
                 ARCHITECTURAL & GALLERY SHOWCASE
               </span>
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light text-studio-charcoal leading-[1.12]">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light text-studio-charcoal leading-[1.12] text-center">
                 Curated Spaces & Tactile Materiality.
               </h1>
-              <p className="mt-4 text-base md:text-lg font-light text-studio-charcoal/70 leading-relaxed max-w-2xl mx-auto">
+              <p className="mt-4 text-base md:text-lg font-light text-studio-charcoal/70 leading-relaxed max-w-2xl mx-auto text-center">
                 An unadorned visual exploration of our residential, commercial, and bespoke spatial designs. Form, light, and texture expressed in quiet balance.
               </p>
             </div>
 
             {/* Category Filter Tabs - WIDE PUSHED TO SIDES WITH GENEROUS INSET & NO UNDERLINE */}
-            <div className="w-full max-w-6xl mx-auto mt-10 flex flex-wrap items-center justify-between gap-6 sm:gap-10 md:gap-14 border-t border-studio-charcoal/10 pt-8 text-xs sm:text-sm tracking-[0.25em] font-light text-studio-charcoal/60 uppercase px-8 sm:px-16 lg:px-24">
+            <div className="w-full max-w-6xl mx-auto mt-10 flex flex-wrap items-center justify-center md:justify-between gap-4 sm:gap-10 md:gap-14 border-t border-studio-charcoal/10 pt-8 text-xs sm:text-sm tracking-[0.25em] font-light text-studio-charcoal/60 uppercase px-4 sm:px-16 lg:px-24 text-center">
               {["all", "residential", "commercial", "styling", "living"].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`transition-colors duration-300 relative py-2 px-1 hover:text-studio-charcoal ${
+                  className={`transition-colors duration-300 relative py-2 px-1 hover:text-studio-charcoal text-center ${
                     activeCategory === cat ? "text-studio-terracotta font-medium" : ""
                   }`}
                   id={`cat-filter-${cat}`}
@@ -344,14 +344,14 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Centered Captions under Image */}
-                    <div className="mt-4 flex flex-col items-center text-center max-w-sm">
-                      <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5">
+                    <div className="mt-4 flex flex-col items-center text-center max-w-sm w-full">
+                      <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5 text-center">
                         0{idx * 2 + 1} • {item.category}
                       </span>
-                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal">
+                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
                         {item.title}
                       </h3>
-                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5">
+                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
                         {item.subtitle}
                       </p>
                     </div>
@@ -386,14 +386,14 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Centered Captions under Image */}
-                    <div className="mt-4 flex flex-col items-center text-center max-w-sm">
-                      <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5">
+                    <div className="mt-4 flex flex-col items-center text-center max-w-sm w-full">
+                      <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5 text-center">
                         0{idx * 2 + 2} • {item.category}
                       </span>
-                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal">
+                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
                         {item.title}
                       </h3>
-                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5">
+                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
                         {item.subtitle}
                       </p>
                     </div>
@@ -407,13 +407,40 @@ export default function ProjectsPage() {
         </section>
 
 
-        {/* 4. LIGHTBOX MODAL */}
+        {/* 4. BOOK CONSULTATION CTA SECTION (COMPACT & SMOOTH CURVED) */}
+        <section className="py-10 md:py-14 bg-studio-beige border-t border-studio-charcoal/10 text-center">
+          <div className="mx-auto max-w-2xl px-6 sm:px-8 flex flex-col items-center">
+            <span className="text-[11px] tracking-[0.25em] font-medium text-studio-terracotta uppercase block mb-2 text-center">
+              START YOUR PROJECT JOURNEY
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl font-light text-studio-charcoal leading-snug text-center">
+              Ready to transform your space?
+            </h2>
+            <p className="mt-2.5 text-xs sm:text-sm font-light text-studio-charcoal/70 leading-relaxed max-w-lg mx-auto text-center">
+              Collaborate with our Nagpur studio to curate bespoke residential and commercial environments.
+            </p>
+
+            <div className="mt-6 flex justify-center w-full">
+              <Link
+                href="/#contact"
+                className="inline-flex items-center justify-center gap-2.5 bg-studio-terracotta text-studio-offwhite px-7 py-3 rounded-full text-xs tracking-widest font-semibold hover:bg-studio-charcoal transition-all duration-300 shadow-sm hover:shadow-md group"
+                id="project-book-consultation-btn"
+              >
+                <span>BOOK CONSULTATION</span>
+                <ArrowRight className="h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform duration-300" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+
+        {/* 5. LIGHTBOX MODAL */}
         {lightboxIndex !== null && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-studio-charcoal/95 backdrop-blur-md p-4 sm:p-8 animate-fade-in-up">
             
             {/* Top Bar: Counter only — no close button */}
-            <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-studio-offwhite/50 z-20">
-              <span className="text-[10px] tracking-[0.3em] uppercase font-light">
+            <div className="absolute top-6 left-6 right-6 flex items-center justify-center sm:justify-between text-studio-offwhite/50 z-20 text-center">
+              <span className="text-[10px] tracking-[0.3em] uppercase font-light text-center">
                 Studio Archive &nbsp;·&nbsp; {String(lightboxIndex + 1).padStart(2, '0')} of {String(currentImagesList.length).padStart(2, '0')}
               </span>
               <span className="text-[10px] tracking-[0.25em] uppercase font-light hidden sm:block">
@@ -453,19 +480,19 @@ export default function ProjectsPage() {
             </button>
 
             {/* Bottom Description Panel */}
-            <div className="relative z-20 mt-2 sm:mt-4 w-full max-w-3xl text-center px-6">
-              <div className="border-t border-studio-offwhite/10 pt-4 sm:pt-5">
-                <span className="text-[9px] tracking-[0.35em] text-studio-terracotta uppercase font-medium block mb-1.5">
+            <div className="relative z-20 mt-2 sm:mt-4 w-full max-w-3xl text-center px-6 flex flex-col items-center">
+              <div className="border-t border-studio-offwhite/10 pt-4 sm:pt-5 w-full flex flex-col items-center text-center">
+                <span className="text-[9px] tracking-[0.35em] text-studio-terracotta uppercase font-medium block mb-1.5 text-center">
                   {currentImagesList[lightboxIndex].category} &nbsp;·&nbsp; Patil Associates
                 </span>
-                <h2 className="font-serif text-lg sm:text-2xl font-light text-studio-offwhite leading-snug mb-2">
+                <h2 className="font-serif text-lg sm:text-2xl font-light text-studio-offwhite leading-snug mb-2 text-center">
                   {currentImagesList[lightboxIndex].title}
                 </h2>
-                <p className="text-xs sm:text-sm font-light text-studio-offwhite/50 leading-relaxed max-w-xl mx-auto italic">
+                <p className="text-xs sm:text-sm font-light text-studio-offwhite/50 leading-relaxed max-w-xl mx-auto italic text-center">
                   Every space we craft carries a silent conversation between light and shadow, texture and void. 
                   This work embodies our belief that true luxury whispers — it never shouts.
                 </p>
-                <p className="mt-2 text-[10px] tracking-widest text-studio-offwhite/30 uppercase">
+                <p className="mt-2 text-[10px] tracking-widest text-studio-offwhite/30 uppercase text-center">
                   {currentImagesList[lightboxIndex].subtitle}
                 </p>
               </div>
@@ -476,20 +503,20 @@ export default function ProjectsPage() {
       </main>
 
 
-      {/* 5. FOOTER */}
+      {/* 6. FOOTER */}
       <footer className="bg-studio-charcoal text-studio-offwhite border-t border-studio-charcoal/20 py-16">
         <div className="mx-auto max-w-7xl px-6 sm:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-studio-offwhite/10 pb-12">
-            <div>
-              <span className="font-serif text-2xl font-light tracking-wide text-studio-offwhite block">
+          <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-8 border-b border-studio-offwhite/10 pb-12">
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <span className="font-serif text-2xl font-light tracking-wide text-studio-offwhite block text-center md:text-left">
                 Patil Associates
               </span>
-              <span className="text-xs text-studio-offwhite/60 tracking-widest uppercase block mt-1">
+              <span className="text-xs text-studio-offwhite/60 tracking-widest uppercase block mt-1 text-center md:text-left">
                 Luxury Interior Design Studio • Nagpur, India
               </span>
             </div>
 
-            <div className="flex items-center space-x-6 text-studio-offwhite/80">
+            <div className="flex items-center justify-center space-x-6 text-studio-offwhite/80">
               <a 
                 href="https://www.instagram.com/showw_up/" 
                 target="_blank" 
@@ -511,9 +538,9 @@ export default function ProjectsPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-studio-offwhite/50 tracking-wider">
-            <span>© {new Date().getFullYear()} Patil Associates. All rights reserved.</span>
-            <Link href="/" className="hover:text-studio-offwhite transition-colors mt-4 sm:mt-0">
+          <div className="mt-8 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left text-xs text-studio-offwhite/50 tracking-wider gap-4 sm:gap-0">
+            <span className="text-center sm:text-left">© {new Date().getFullYear()} Patil Associates. All rights reserved.</span>
+            <Link href="/" className="hover:text-studio-offwhite transition-colors mt-4 sm:mt-0 text-center">
               Return to Home Page ↑
             </Link>
           </div>

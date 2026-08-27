@@ -132,23 +132,25 @@ export default function Home() {
   const [formStatus, setFormStatus] = useState("idle"); // idle, loading, success, error
   const [formErrorMsg, setFormErrorMsg] = useState("");
 
-  // Top overlay inquiry state (1-time display per visit session)
-  const [showInquiryOverlay, setShowInquiryOverlay] = useState(false);
-
-  useEffect(() => {
-    // Check if user has already dismissed the top overlay in this session
-    const isDismissed = typeof window !== "undefined" ? sessionStorage.getItem("inquiry_dismissed") : "true";
-    if (!isDismissed) {
-      setShowInquiryOverlay(true);
-    }
-  }, []);
+  // Top overlay inquiry state (shows pop up form first when entering home page)
+  const [showInquiryOverlay, setShowInquiryOverlay] = useState(true);
 
   const handleDismissOverlay = () => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("inquiry_dismissed", "true");
-    }
     setShowInquiryOverlay(false);
   };
+
+  // Handle hash scrolling on page load (e.g. when navigating from /projects to /#contact)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const id = window.location.hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  }, []);
 
   // Auto-play testimonial slider
   useEffect(() => {
@@ -223,7 +225,8 @@ export default function Home() {
       if (response.ok) {
         setFormStatus("success");
         if (typeof window !== "undefined") {
-          sessionStorage.setItem("inquiry_dismissed", "true");
+          sessionStorage.setItem("has_seen_welcome_popup", "true");
+          localStorage.setItem("has_seen_welcome_popup", "true");
         }
 
         const projectTypeLabels = {
@@ -239,21 +242,21 @@ export default function Home() {
           "budget-4": "Over ₹1.5Cr (INR)"
         };
 
-        const projectLabel = projectTypeLabels[formProjectType] || formProjectType;
-        const budgetLabel = budgetLabels[formBudgetRange] || formBudgetRange;
+        const waText = encodeURIComponent(
+          `*New Design Consultation Inquiry - Patil Associates*\n` +
+          `-----------------------------------------\n` +
+          `• *Client Name:* ${formName}\n` +
+          `• *Email:* ${formEmail}\n` +
+          `• *Project Type:* ${projectTypeLabels[formProjectType] || formProjectType}\n` +
+          `• *Budget Range:* ${budgetLabels[formBudgetRange] || formBudgetRange}\n` +
+          `• *Message/Scope:* ${formMessage || "N/A"}\n` +
+          `-----------------------------------------\n` +
+          `_Sent via Patil Associates Luxury Studio Portal_`
+        );
 
-        const waText = `Hello Patil Associates,
-
-I would like to start a project journey with you! Here are my inquiry details:
-
-• Name: ${formName}
-• Email: ${formEmail}
-• Project Type: ${projectLabel}
-• Budget: ${budgetLabel}
-• Message: ${formMessage}`;
-
-        const whatsappUrl = `https://wa.me/919823577149?text=${encodeURIComponent(waText)}`;
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+        setTimeout(() => {
+          window.open(`https://wa.me/919823577149?text=${waText}`, "_blank");
+        }, 1200);
 
         setFormName("");
         setFormEmail("");
@@ -273,12 +276,12 @@ I would like to start a project journey with you! Here are my inquiry details:
   return (
     <div className="flex-1 flex flex-col font-sans selection:bg-studio-terracotta selection:text-studio-offwhite relative">
 
-      {/* 1. TOP OVERLAY INQUIRY FORM LAYER (1-Time Display Per Visit Session) */}
+      {/* 1. FIRST-TIME ENTERING INQUIRY POPUP OVERLAY */}
       {showInquiryOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-studio-charcoal/75 backdrop-blur-md transition-opacity duration-300">
-          <div className="relative w-full max-w-2xl bg-studio-beige border border-studio-charcoal/20 shadow-2xl p-6 sm:p-8 md:p-10 rounded-none text-studio-charcoal max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-studio-charcoal/80 backdrop-blur-md transition-opacity duration-300">
+          <div className="relative w-full max-w-2xl bg-studio-beige border border-studio-charcoal/20 shadow-2xl p-6 sm:p-8 md:p-10 rounded-sm text-studio-charcoal max-h-[92vh] overflow-y-auto">
             
-            {/* Top Bar — label only, no close button */}
+            {/* Top Bar with Close Button */}
             <div className="flex items-center justify-between border-b border-studio-charcoal/10 pb-4 mb-6">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-studio-terracotta animate-pulse" />
@@ -286,9 +289,15 @@ I would like to start a project journey with you! Here are my inquiry details:
                   PATIL ASSOCIATES INQUIRY
                 </span>
               </div>
-              <span className="text-[10px] tracking-widest text-studio-charcoal/30 uppercase hidden sm:block">
-                Nagpur · Est. 2018
-              </span>
+              <button
+                type="button"
+                onClick={handleDismissOverlay}
+                className="p-1 text-studio-charcoal/60 hover:text-studio-terracotta transition-colors rounded-full hover:bg-studio-charcoal/5"
+                aria-label="Close modal"
+                id="close-popup-btn"
+              >
+                <X className="h-5 w-5 stroke-[1.5]" />
+              </button>
             </div>
 
             {/* Header Content */}
@@ -296,6 +305,9 @@ I would like to start a project journey with you! Here are my inquiry details:
               <h2 className="font-serif text-2xl sm:text-3xl font-light text-studio-charcoal leading-snug">
                 Transform Your Space into a Living Masterpiece
               </h2>
+              <p className="mt-2 text-xs sm:text-sm font-light text-studio-charcoal/70">
+                Tell us about your project in Nagpur and let our architectural studio bring your vision to life.
+              </p>
             </div>
 
             {/* Form */}
@@ -313,7 +325,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                     onClick={handleDismissOverlay} 
                     className="underline text-xs shrink-0 font-medium"
                   >
-                    View Website
+                    Close
                   </button>
                 </div>
               )}
@@ -436,7 +448,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                   onClick={handleDismissOverlay}
                   className="text-xs tracking-wider text-studio-charcoal/50 hover:text-studio-charcoal/80 underline underline-offset-4 transition-colors"
                 >
-                  Explore our portfolio first →
+                  Explore portfolio first →
                 </button>
               </div>
             </form>
@@ -445,7 +457,6 @@ I would like to start a project journey with you! Here are my inquiry details:
         </div>
       )}
 
-      
       {/* 2. SITE NAVIGATION & HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-studio-charcoal/10 bg-studio-beige/85 backdrop-blur-md transition-all duration-300">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 sm:px-8">
@@ -539,11 +550,11 @@ I would like to start a project journey with you! Here are my inquiry details:
             </button>
           </div>
 
-          <nav className="flex flex-col space-y-8 my-auto text-2xl font-serif text-studio-charcoal">
+          <nav className="flex flex-col space-y-8 my-auto text-2xl font-serif text-studio-charcoal text-center items-center">
             <a 
               href="#projects" 
               onClick={(e) => handleScroll(e, "projects")}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 w-full text-center"
               id="mobile-nav-projects"
             >
               Projects
@@ -551,7 +562,7 @@ I would like to start a project journey with you! Here are my inquiry details:
             <a 
               href="#about" 
               onClick={(e) => handleScroll(e, "about")}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 w-full text-center"
               id="mobile-nav-about"
             >
               About Studio
@@ -559,7 +570,7 @@ I would like to start a project journey with you! Here are my inquiry details:
             <a 
               href="#process" 
               onClick={(e) => handleScroll(e, "process")}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 w-full text-center"
               id="mobile-nav-process"
             >
               Design Process
@@ -567,7 +578,7 @@ I would like to start a project journey with you! Here are my inquiry details:
             <a 
               href="#testimonials" 
               onClick={(e) => handleScroll(e, "testimonials")}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 w-full text-center"
               id="mobile-nav-testimonials"
             >
               Client Stories
@@ -575,14 +586,14 @@ I would like to start a project journey with you! Here are my inquiry details:
             <a 
               href="#contact" 
               onClick={(e) => handleScroll(e, "contact")}
-              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5"
+              className="hover:text-studio-terracotta transition-colors py-2 border-b border-studio-charcoal/5 w-full text-center"
               id="mobile-nav-contact"
             >
               Contact Inquiry
             </a>
           </nav>
 
-          <div className="text-xs text-studio-charcoal/50 tracking-wider">
+          <div className="text-xs text-studio-charcoal/50 tracking-wider text-center">
             Nagpur, Maharashtra, India
           </div>
         </div>
@@ -602,10 +613,10 @@ I would like to start a project journey with you! Here are my inquiry details:
               alt="Serene modern luxury living room by Patil Associates" 
               fill
               priority
-              className="object-cover object-center opacity-95 brightness-100"
+              className="object-cover object-center opacity-100 brightness-100 contrast-[1.02]"
             />
-            {/* Subtle soft plaster gradient filter */}
-            <div className="absolute inset-0 bg-gradient-to-t from-studio-beige/85 via-studio-beige/25 to-transparent md:bg-gradient-to-r md:from-studio-beige md:via-studio-beige/60 md:to-transparent" />
+            {/* Ultra-subtle edge feathering — crisp clear wallpaper without blur/fog */}
+            <div className="absolute inset-0 bg-gradient-to-t from-studio-beige/85 via-studio-beige/15 to-transparent md:bg-gradient-to-r md:from-studio-beige/80 md:via-transparent md:to-transparent pointer-events-none" />
           </div>
 
           <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 z-10 pb-8 sm:pb-0">
@@ -640,21 +651,21 @@ I would like to start a project journey with you! Here are my inquiry details:
                 <a 
                   href="#projects" 
                   onClick={(e) => handleScroll(e, "projects")}
-                  className="group inline-flex items-center gap-2.5 text-xs sm:text-sm tracking-[0.2em] font-semibold text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300"
+                  className="group inline-flex items-center gap-2.5 text-xs sm:text-sm tracking-[0.2em] font-medium uppercase text-studio-charcoal hover:text-studio-terracotta transition-colors duration-300"
                   id="hero-cta-btn"
                 >
                   <span className="inline sm:hidden">EXPLORE WORK</span>
                   <span className="hidden sm:inline">VIEW PORTFOLIO</span>
-                  <ArrowRight className="h-4 w-4 stroke-[1.5] transform group-hover:translate-x-2 transition-transform duration-300 text-studio-terracotta" />
+                  <ArrowRight className="h-4 w-4 stroke-[1.5] transform group-hover:translate-x-1.5 transition-transform duration-300 text-studio-terracotta" />
                 </a>
-                
+
                 {/* Scroll Indicator */}
                 <a 
                   href="#about" 
                   onClick={(e) => handleScroll(e, "about")}
-                  className="inline-flex items-center text-xs tracking-[0.2em] font-light text-studio-charcoal/50 hover:text-studio-charcoal/80 transition-colors"
+                  className="group inline-flex items-center text-xs tracking-[0.2em] font-light text-studio-charcoal/60 hover:text-studio-terracotta transition-colors duration-300 uppercase"
                 >
-                  SCROLL TO DISCOVER
+                  <span>SCROLL TO DISCOVER</span>
                 </a>
               </div>
             </div>
@@ -684,21 +695,21 @@ I would like to start a project journey with you! Here are my inquiry details:
               </div>
 
               {/* Right Column: Copy & Grid */}
-              <div className="lg:col-span-7 flex flex-col justify-center reveal-element reveal-text-up">
-                <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
+              <div className="lg:col-span-7 flex flex-col justify-center items-center lg:items-start text-center lg:text-left reveal-element reveal-text-up">
+                <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase text-center lg:text-left">
                   THE STUDIO
                 </span>
                 
-                <h2 className="mt-4 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal leading-tight">
+                <h2 className="mt-4 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal leading-tight text-center lg:text-left">
                   Every space tells a story.
                 </h2>
                 
-                <p className="mt-6 text-base md:text-lg leading-relaxed font-light text-studio-charcoal/70">
+                <p className="mt-6 text-base md:text-lg leading-relaxed font-light text-studio-charcoal/70 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
                   Based out of Nagpur, studio Patil Associates curates bespoke residential and commercial environments where functionality meets quiet luxury. We believe that true sophistication lies in the balance of light, line, and organic texture.
                 </p>
 
                 {/* Read More button */}
-                <div className="mt-6">
+                <div className="mt-6 flex justify-center lg:justify-start w-full">
                   <a 
                     href="#contact" 
                     onClick={(e) => handleScroll(e, "contact")}
@@ -710,37 +721,37 @@ I would like to start a project journey with you! Here are my inquiry details:
                 </div>
 
                 {/* Key Pillars (3-column micro grid) */}
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 border-t border-studio-charcoal/10">
+                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 pt-10 border-t border-studio-charcoal/10 w-full text-center md:text-left">
                   
                   {/* Pillar 1 */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
                     <Compass className="h-6 w-6 stroke-[1.2] text-studio-terracotta mb-4" />
-                    <h3 className="font-serif text-lg font-medium text-studio-charcoal">
+                    <h3 className="font-serif text-lg font-medium text-studio-charcoal text-center md:text-left">
                       Spatial Harmony
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60">
+                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60 text-center md:text-left">
                       Thoughtful layouts that bring balance, flow and purpose to every space.
                     </p>
                   </div>
 
                   {/* Pillar 2 */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
                     <Layers className="h-6 w-6 stroke-[1.2] text-studio-terracotta mb-4" />
-                    <h3 className="font-serif text-lg font-medium text-studio-charcoal">
+                    <h3 className="font-serif text-lg font-medium text-studio-charcoal text-center md:text-left">
                       Curated Materiality
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60">
+                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60 text-center md:text-left">
                       We source and combine materials that age beautifully and feel honest.
                     </p>
                   </div>
 
                   {/* Pillar 3 */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
                     <Award className="h-6 w-6 stroke-[1.2] text-studio-terracotta mb-4" />
-                    <h3 className="font-serif text-lg font-medium text-studio-charcoal">
+                    <h3 className="font-serif text-lg font-medium text-studio-charcoal text-center md:text-left">
                       Bespoke Craftsmanship
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60">
+                    <p className="mt-2 text-xs leading-relaxed font-light text-studio-charcoal/60 text-center md:text-left">
                       Custom furniture and details crafted with precision and care.
                     </p>
                   </div>
@@ -758,8 +769,8 @@ I would like to start a project journey with you! Here are my inquiry details:
           <div className="mx-auto max-w-7xl px-6 sm:px-8">
             
             {/* Header + Filters */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-10 border-b border-studio-charcoal/10">
-              <div>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between items-center text-center lg:text-left gap-8 pb-10 border-b border-studio-charcoal/10">
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                 <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
                   SELECTED PROJECTS
                 </span>
@@ -769,7 +780,7 @@ I would like to start a project journey with you! Here are my inquiry details:
               </div>
               
               {/* Filter tabs */}
-              <div className="flex flex-wrap items-center gap-8 md:gap-14 text-xs tracking-[0.25em] font-light text-studio-charcoal/60 uppercase">
+              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-6 sm:gap-8 md:gap-14 text-xs tracking-[0.25em] font-light text-studio-charcoal/60 uppercase">
                 {["all", "residential", "commercial", "styling"].map((cat) => (
                   <button
                     key={cat}
@@ -798,7 +809,7 @@ I would like to start a project journey with you! Here are my inquiry details:
                 return (
                   <article 
                     key={project.id} 
-                    className={`${gridClasses} group flex flex-col bg-transparent`}
+                    className={`${gridClasses} group flex flex-col items-center md:items-start bg-transparent text-center md:text-left`}
                   >
                     <div className={`relative w-full border border-studio-charcoal/5 shadow-sm overflow-hidden ${
                       idx % 2 === 1 ? "aspect-[4/5]" : "aspect-square"
@@ -820,18 +831,16 @@ I would like to start a project journey with you! Here are my inquiry details:
                       </div>
                     </div>
 
-                    <div className="mt-6 flex items-start justify-between">
-                      <div>
-                        <span className="text-[10px] tracking-widest font-light text-studio-charcoal/40 uppercase block mb-1">
-                          0{idx + 1}
-                        </span>
-                        <h3 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal group-hover:text-studio-terracotta transition-colors duration-300">
-                          {project.title}
-                        </h3>
-                        <p className="text-xs font-light text-studio-charcoal/60 mt-1">
-                          {project.subtitle}
-                        </p>
-                      </div>
+                    <div className="mt-6 flex flex-col items-center md:items-start text-center md:text-left w-full">
+                      <span className="text-[10px] tracking-widest font-light text-studio-charcoal/40 uppercase block mb-1 text-center md:text-left">
+                        0{idx + 1}
+                      </span>
+                      <h3 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal group-hover:text-studio-terracotta transition-colors duration-300 text-center md:text-left">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs font-light text-studio-charcoal/60 mt-1 text-center md:text-left">
+                        {project.subtitle}
+                      </p>
                     </div>
                   </article>
                 );
@@ -863,13 +872,13 @@ I would like to start a project journey with you! Here are my inquiry details:
           <div className="mx-auto max-w-7xl px-6 sm:px-8">
             
             <div className="text-center max-w-xl mx-auto mb-16 md:mb-24 reveal-element reveal-text-up">
-              <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
+              <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase text-center block">
                 OUR DESIGN PROCESS
               </span>
-              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal">
+              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal text-center">
                 From Concept to Handover
               </h2>
-              <p className="mt-4 text-sm font-light text-studio-charcoal/60 leading-relaxed">
+              <p className="mt-4 text-sm font-light text-studio-charcoal/60 leading-relaxed text-center">
                 Click on the steps below to explore our detailed design roadmap and see how we execute projects.
               </p>
             </div>
@@ -895,14 +904,14 @@ I would like to start a project journey with you! Here are my inquiry details:
                     <span className="font-serif text-xs sm:text-sm font-medium">{step.number}</span>
                   </div>
                   
-                  <h3 className={`mt-3 sm:mt-6 font-serif text-xs sm:text-lg font-medium transition-colors ${
+                  <h3 className={`mt-3 sm:mt-6 font-serif text-xs sm:text-lg font-medium transition-colors text-center ${
                     activeStep === idx ? "text-studio-terracotta font-medium" : "text-studio-charcoal/70"
                   }`}>
                     <span className="hidden sm:inline">{step.title}</span>
                     <span className="inline sm:hidden">{step.title.split(" ")[0]}</span>
                   </h3>
                   
-                  <span className="hidden sm:block text-[10px] tracking-widest text-studio-charcoal/40 uppercase mt-1">
+                  <span className="hidden sm:block text-[10px] tracking-widest text-studio-charcoal/40 uppercase mt-1 text-center">
                     {step.tagline}
                   </span>
                 </button>
@@ -912,25 +921,25 @@ I would like to start a project journey with you! Here are my inquiry details:
             {/* Interactive Timeline Detail Box */}
             <div className="mt-10 lg:mt-16 mx-auto max-w-4xl bg-studio-beige border border-studio-charcoal/10 p-6 sm:p-8 md:p-12 shadow-sm rounded-sm reveal-element reveal-text-up">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
-                <div className="md:col-span-3 flex flex-col md:border-r border-studio-charcoal/10 md:pr-8 h-full justify-between">
-                  <div className="text-studio-terracotta font-serif text-4xl sm:text-6xl font-extralight tracking-tighter">
+                <div className="md:col-span-3 flex flex-col items-center md:items-start text-center md:text-left md:border-r border-studio-charcoal/10 md:pr-8 h-full justify-between">
+                  <div className="text-studio-terracotta font-serif text-4xl sm:text-6xl font-extralight tracking-tighter text-center md:text-left">
                     {PROCESS_STEPS[activeStep].number}
                   </div>
-                  <div className="mt-2 md:mt-0">
-                    <span className="text-[10px] sm:text-xs text-studio-terracotta font-medium tracking-widest uppercase block mb-0.5">
+                  <div className="mt-2 md:mt-0 text-center md:text-left">
+                    <span className="text-[10px] sm:text-xs text-studio-terracotta font-medium tracking-widest uppercase block mb-0.5 text-center md:text-left">
                       FOCUS
                     </span>
-                    <span className="font-serif text-base sm:text-lg text-studio-charcoal font-medium">
+                    <span className="font-serif text-base sm:text-lg text-studio-charcoal font-medium text-center md:text-left">
                       {PROCESS_STEPS[activeStep].tagline}
                     </span>
                   </div>
                 </div>
 
-                <div className="md:col-span-9 md:pl-4">
-                  <h4 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal mb-3">
+                <div className="md:col-span-9 md:pl-4 flex flex-col items-center md:items-start text-center md:text-left">
+                  <h4 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal mb-3 text-center md:text-left">
                     {PROCESS_STEPS[activeStep].title}
                   </h4>
-                  <p className="text-xs sm:text-sm md:text-base font-light text-studio-charcoal/70 leading-relaxed">
+                  <p className="text-xs sm:text-sm md:text-base font-light text-studio-charcoal/70 leading-relaxed text-center md:text-left">
                     {PROCESS_STEPS[activeStep].description}
                   </p>
                 </div>
@@ -957,22 +966,22 @@ I would like to start a project journey with you! Here are my inquiry details:
             />
           </div>
 
-          <div className="mx-auto max-w-4xl px-6 sm:px-8 relative z-10 text-center">
-            <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
+          <div className="mx-auto max-w-4xl px-6 sm:px-8 relative z-10 text-center flex flex-col items-center">
+            <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase text-center block">
               CLIENT STORIES
             </span>
             
             {/* Testimonials slider display */}
-            <div className="mt-12 min-h-[160px] flex items-center justify-center">
-              <blockquote className="transition-opacity duration-500 ease-in-out">
-                <p className="font-serif text-xl sm:text-2xl lg:text-3xl italic font-light leading-relaxed text-studio-charcoal">
+            <div className="mt-12 min-h-[160px] flex items-center justify-center text-center">
+              <blockquote className="transition-opacity duration-500 ease-in-out text-center flex flex-col items-center">
+                <p className="font-serif text-xl sm:text-2xl lg:text-3xl italic font-light leading-relaxed text-studio-charcoal text-center">
                   &ldquo;{TESTIMONIALS[testimonialIndex].quote}&rdquo;
                 </p>
-                <cite className="mt-8 not-italic block">
-                  <span className="text-xs tracking-[0.2em] font-semibold text-studio-charcoal block">
+                <cite className="mt-8 not-italic block text-center">
+                  <span className="text-xs tracking-[0.2em] font-semibold text-studio-charcoal block text-center">
                     — {TESTIMONIALS[testimonialIndex].author}
                   </span>
-                  <span className="text-[10px] tracking-widest text-studio-charcoal/40 uppercase block mt-1">
+                  <span className="text-[10px] tracking-widest text-studio-charcoal/40 uppercase block mt-1 text-center">
                     {TESTIMONIALS[testimonialIndex].location} Client
                   </span>
                 </cite>
@@ -1027,23 +1036,23 @@ I would like to start a project journey with you! Here are my inquiry details:
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
               
               {/* Left Column: Secure Inquiry Form */}
-              <div className="lg:col-span-7">
-                <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase">
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+                <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase text-center lg:text-left">
                   LET'S CREATE SOMETHING BEAUTIFUL
                 </span>
                 
-                <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal">
+                <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-light text-studio-charcoal text-center lg:text-left">
                   Start Your Project Journey
                 </h2>
                 
-                <p className="mt-4 text-sm font-light text-studio-charcoal/60 max-w-md">
+                <p className="mt-4 text-sm font-light text-studio-charcoal/60 max-w-md mx-auto lg:mx-0 text-center lg:text-left">
                   Share details about your residential or commercial space, and we will get back to you within 48 hours.
                 </p>
 
                 {/* Secure Form submit with server validation responses */}
                 <form 
                   onSubmit={handleSubmit} 
-                  className="mt-10 space-y-6"
+                  className="mt-10 space-y-6 w-full text-left"
                   id="inquiry-form"
                 >
                   
@@ -1148,24 +1157,26 @@ I would like to start a project journey with you! Here are my inquiry details:
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={formStatus === "loading"}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-studio-terracotta text-studio-offwhite px-8 py-4 text-xs tracking-widest font-semibold hover:bg-studio-charcoal transition-colors duration-300 disabled:opacity-50 disabled:pointer-events-none"
-                    id="submit-inquiry-btn"
-                  >
-                    {formStatus === "loading" ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>PROCESSING...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>SEND INQUIRY</span>
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
+                  <div className="flex justify-center sm:justify-start w-full">
+                    <button
+                      type="submit"
+                      disabled={formStatus === "loading"}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-studio-terracotta text-studio-offwhite px-8 py-4 text-xs tracking-widest font-semibold hover:bg-studio-charcoal transition-colors duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                      id="submit-inquiry-btn"
+                    >
+                      {formStatus === "loading" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>PROCESSING...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>SEND INQUIRY</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                   
                 </form>
               </div>
