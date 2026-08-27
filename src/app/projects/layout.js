@@ -19,6 +19,55 @@ export const metadata = {
   },
 };
 
+const projectsJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://patilassociates.com/projects#collection",
+      "url": "https://patilassociates.com/projects",
+      "name": "Architectural & Interior Design Projects Portfolio | Patil Associates",
+      "description": "Curated portfolio of bespoke residential, commercial workspaces, living lounges, and custom tactile interior spaces in Nagpur by Patil Associates.",
+      "isPartOf": {
+        "@id": "https://patilassociates.com/#website"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://patilassociates.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Projects Portfolio",
+            "item": "https://patilassociates.com/projects"
+          }
+        ]
+      }
+    },
+    {
+      "@type": "ImageGallery",
+      "@id": "https://patilassociates.com/projects#gallery",
+      "name": "Patil Associates Curated Works Gallery",
+      "author": {
+        "@id": "https://patilassociates.com/#studio"
+      }
+    }
+  ]
+};
+
 export default function ProjectsLayout({ children }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectsJsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

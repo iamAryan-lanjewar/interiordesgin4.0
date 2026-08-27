@@ -809,15 +809,20 @@ export default function Home() {
                 return (
                   <article 
                     key={project.id} 
+                    itemScope
+                    itemType="https://schema.org/CreativeWork"
                     className={`${gridClasses} group flex flex-col items-center md:items-start bg-transparent text-center md:text-left`}
                   >
+                    <meta itemProp="provider" content="Patil Associates" />
+                    <meta itemProp="creator" content="Patil Associates" />
                     <div className={`relative w-full border border-studio-charcoal/5 shadow-sm overflow-hidden ${
                       idx % 2 === 1 ? "aspect-[4/5]" : "aspect-square"
                     }`}>
                       <Image 
                         src={project.image} 
-                        alt={`${project.title} — ${project.subtitle} by Patil Associates Interior Studio Nagpur`} 
+                        alt={`${project.title} — ${project.subtitle} by Patil Associates Luxury Interior Design Nagpur`} 
                         fill
+                        itemProp="image"
                         sizes="(max-width: 768px) 100vw, 600px"
                         className="object-cover"
                       />
@@ -825,8 +830,8 @@ export default function Home() {
                       {/* Project quick details overlay on hover */}
                       <div className="absolute inset-0 bg-studio-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 md:p-8">
                         <div className="text-studio-offwhite text-xs tracking-widest font-light flex items-center justify-between">
-                          <span>{project.location}</span>
-                          <span>{project.year}</span>
+                          <span itemProp="contentLocation">{project.location}</span>
+                          <span itemProp="dateCreated">{project.year}</span>
                         </div>
                       </div>
                     </div>
@@ -835,10 +840,10 @@ export default function Home() {
                       <span className="text-[10px] tracking-widest font-light text-studio-charcoal/40 uppercase block mb-1 text-center md:text-left">
                         0{idx + 1}
                       </span>
-                      <h3 className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal group-hover:text-studio-terracotta transition-colors duration-300 text-center md:text-left">
+                      <h3 itemProp="name" className="font-serif text-xl sm:text-2xl font-light text-studio-charcoal group-hover:text-studio-terracotta transition-colors duration-300 text-center md:text-left">
                         {project.title}
                       </h3>
-                      <p className="text-xs font-light text-studio-charcoal/60 mt-1 text-center md:text-left">
+                      <p itemProp="description" className="text-xs font-light text-studio-charcoal/60 mt-1 text-center md:text-left">
                         {project.subtitle}
                       </p>
                     </div>
@@ -973,12 +978,16 @@ export default function Home() {
             
             {/* Testimonials slider display */}
             <div className="mt-12 min-h-[160px] flex items-center justify-center text-center">
-              <blockquote className="transition-opacity duration-500 ease-in-out text-center flex flex-col items-center">
-                <p className="font-serif text-xl sm:text-2xl lg:text-3xl italic font-light leading-relaxed text-studio-charcoal text-center">
+              <blockquote 
+                itemScope 
+                itemType="https://schema.org/Review"
+                className="transition-opacity duration-500 ease-in-out text-center flex flex-col items-center"
+              >
+                <p itemProp="reviewBody" className="font-serif text-xl sm:text-2xl lg:text-3xl italic font-light leading-relaxed text-studio-charcoal text-center">
                   &ldquo;{TESTIMONIALS[testimonialIndex].quote}&rdquo;
                 </p>
-                <cite className="mt-8 not-italic block text-center">
-                  <span className="text-xs tracking-[0.2em] font-semibold text-studio-charcoal block text-center">
+                <cite itemProp="author" itemScope itemType="https://schema.org/Person" className="mt-8 not-italic block text-center">
+                  <span itemProp="name" className="text-xs tracking-[0.2em] font-semibold text-studio-charcoal block text-center">
                     — {TESTIMONIALS[testimonialIndex].author}
                   </span>
                   <span className="text-[10px] tracking-widest text-studio-charcoal/40 uppercase block mt-1 text-center">
@@ -1185,7 +1194,7 @@ export default function Home() {
               <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-12">
                 
                 {/* Details list */}
-                <div className="space-y-8">
+                <address className="not-italic space-y-8" itemScope itemType="https://schema.org/PostalAddress">
                   <span className="text-xs tracking-[0.25em] font-medium text-studio-terracotta uppercase block">
                     STUDIO DETAILS
                   </span>
@@ -1197,7 +1206,7 @@ export default function Home() {
                       <div>
                         <span className="font-medium text-studio-charcoal block">Nagpur Head Office</span>
                         <p className="mt-1 font-light text-studio-charcoal/70 leading-relaxed">
-                          Shop No. 3, Ground, 2, Besa-Pipla Rd, Atharva Nagri 2, Manewada, Besa Pipla, Maharashtra 440037
+                          <span itemProp="streetAddress">Shop No. 3, Ground, 2, Besa-Pipla Rd, Atharva Nagri 2, Manewada, Besa Pipla</span>, <span itemProp="addressLocality">Nagpur</span>, <span itemProp="addressRegion">Maharashtra</span> <span itemProp="postalCode">440037</span>, <span itemProp="addressCountry">India</span>
                         </p>
                       </div>
                     </div>
@@ -1232,7 +1241,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </address>
 
                 {/* High-end Fast Loading Styled Map Frame */}
                 <LazyMap />

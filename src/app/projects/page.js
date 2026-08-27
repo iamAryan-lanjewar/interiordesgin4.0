@@ -320,7 +320,14 @@ export default function ProjectsPage() {
               {/* Left Column */}
               <div className="flex flex-col space-y-8 md:space-y-12 lg:space-y-14">
                 {leftColItems.map((item, idx) => (
-                  <article key={item.id} className="flex flex-col items-center text-center">
+                  <article 
+                    key={item.id} 
+                    itemScope 
+                    itemType="https://schema.org/VisualArtwork"
+                    className="flex flex-col items-center text-center"
+                  >
+                    <meta itemProp="creator" content="Patil Associates" />
+                    <meta itemProp="artMedium" content="Interior Architecture" />
                     <div
                       onClick={() => openLightbox(item.id)}
                       className="group relative cursor-pointer overflow-hidden border border-studio-charcoal/10 bg-studio-beige shadow-sm transition-all duration-500 hover:shadow-xl w-full rounded-sm"
@@ -330,6 +337,7 @@ export default function ProjectsPage() {
                           src={item.image}
                           alt={`${item.title} — ${item.subtitle} | Patil Associates Luxury Interior Portfolio Nagpur`}
                           fill
+                          itemProp="image"
                           sizes="(max-width: 768px) 100vw, 600px"
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                         />
@@ -348,10 +356,10 @@ export default function ProjectsPage() {
                       <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5 text-center">
                         0{idx * 2 + 1} • {item.category}
                       </span>
-                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
+                      <h3 itemProp="name" className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
                         {item.title}
                       </h3>
-                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
+                      <p itemProp="description" className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
                         {item.subtitle}
                       </p>
                     </div>
@@ -362,7 +370,14 @@ export default function ProjectsPage() {
               {/* Right Column (Offset Non-Parallel Rhythm) */}
               <div className="flex flex-col space-y-8 md:space-y-12 lg:space-y-14 pt-0 md:pt-12 lg:pt-16">
                 {rightColItems.map((item, idx) => (
-                  <article key={item.id} className="flex flex-col items-center text-center">
+                  <article 
+                    key={item.id} 
+                    itemScope 
+                    itemType="https://schema.org/VisualArtwork"
+                    className="flex flex-col items-center text-center"
+                  >
+                    <meta itemProp="creator" content="Patil Associates" />
+                    <meta itemProp="artMedium" content="Interior Architecture" />
                     <div
                       onClick={() => openLightbox(item.id)}
                       className="group relative cursor-pointer overflow-hidden border border-studio-charcoal/10 bg-studio-beige shadow-sm transition-all duration-500 hover:shadow-xl w-full rounded-sm"
@@ -372,6 +387,7 @@ export default function ProjectsPage() {
                           src={item.image}
                           alt={`${item.title} — ${item.subtitle} | Patil Associates Luxury Interior Portfolio Nagpur`}
                           fill
+                          itemProp="image"
                           sizes="(max-width: 768px) 100vw, 600px"
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                         />
@@ -390,10 +406,10 @@ export default function ProjectsPage() {
                       <span className="text-[10px] tracking-widest font-light text-studio-terracotta uppercase block mb-0.5 text-center">
                         0{idx * 2 + 2} • {item.category}
                       </span>
-                      <h3 className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
+                      <h3 itemProp="name" className="font-serif text-lg sm:text-xl font-light text-studio-charcoal text-center">
                         {item.title}
                       </h3>
-                      <p className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
+                      <p itemProp="description" className="text-xs font-light text-studio-charcoal/60 mt-0.5 text-center">
                         {item.subtitle}
                       </p>
                     </div>
